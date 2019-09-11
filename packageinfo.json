@@ -1,0 +1,40 @@
+{
+	"language": "python3",
+	"name": "jk_hwriter",
+	"version": "0.2019.9.11",
+	"meta": {
+		"description": "This python module supports writing indented text files.",
+		"keywords": [
+		],
+		"license": "Apache 2.0",
+		"development_status": "beta",
+		"authors": [
+			{
+				"name": "Jürgen Knauth",
+				"email": "pubsrc@binary-overflow.de"
+			}
+		],
+		"wiki": {
+			"page": "DevDocs:jk_hwriter"
+		}
+	},
+	"repositories": [
+		{
+			"type": "github",
+			"user": "jkpubsrc",
+			"project": "python-module-jk-hwriter"
+		}
+	],
+	"source": {
+		"packages": [
+			"jk_hwriter"
+		],
+		"extra_data_files": [
+		]
+	},
+	"requirements": {
+		"python_packages": [
+		]
+	}
+}
+
