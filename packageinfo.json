@@ -7,7 +7,7 @@
 		"keywords": [
 		],
 		"license": "Apache 2.0",
-		"development_status": "beta",
+		"development_status": "stable",
 		"authors": [
 			{
 				"name": "Jürgen Knauth",
@@ -22,7 +22,13 @@
 		{
 			"type": "github",
 			"user": "jkpubsrc",
-			"project": "python-module-jk-hwriter"
+			"project": "python-module-jk-hwriter",
+			"devon_publish": true
+		},
+		{
+			"type": "pypy",
+			"project": "jk_hwriter",
+			"devon_publish": true
 		}
 	],
 	"source": {

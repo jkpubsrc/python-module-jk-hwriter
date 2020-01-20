@@ -19,8 +19,7 @@ setup(
 	author = "Jürgen Knauth",
 	author_email = "pubsrc@binary-overflow.de",
 	classifiers = [
-		"Programming Language :: Python :: 3",
-		"Development Status :: 4 - Beta",
+		"Development Status :: 5 - Production/Stable",
 		"License :: OSI Approved :: Apache Software License",
 	],
 	description = "This python module supports writing indented text files.",
