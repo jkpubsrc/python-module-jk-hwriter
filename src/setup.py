@@ -21,21 +21,20 @@ setup(
 	classifiers = [
 		"Development Status :: 5 - Production/Stable",
 		"License :: OSI Approved :: Apache Software License",
+		"Programming Language :: Python :: 3",
 	],
 	description = "This python module supports writing indented text files.",
-	download_url = "https://github.com/jkpubsrc/python-module-jk-hwriter/tarball/0.2019.9.11",
 	include_package_data = False,
 	install_requires = [
 	],
 	keywords = [
 	],
-	license = "Apache 2.0",
+	license = "Apache2",
 	name = "jk_hwriter",
 	packages = [
 		"jk_hwriter",
 	],
-	url = "https://github.com/jkpubsrc/python-module-jk-hwriter",
-	version = "0.2019.9.11",
+	version = "0.2021.1.17",
 	zip_safe = False,
 	long_description = readme(),
 	long_description_content_type="text/markdown",
