@@ -126,14 +126,14 @@ class HWriter2(jk_prettyprintobj.DumpMixin):
 		return list(self.__lines)
 	#
 
-	def toString(self) -> str:
+	def toStr(self) -> str:
 		self.lineBreak()
 		return "\n".join(self.__lines)
 	#
 
 	def __str__(self):
 		self.lineBreak()
-		return " ".join(self.__lines)
+		return "\n".join(self.__lines)
 	#
 
 	def __repr__(self):
