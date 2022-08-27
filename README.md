@@ -8,7 +8,7 @@ This python module provides a single class: A buffer that can be used to create 
 
 Information about this module can be found here:
 
-* [github.org](https://github.com/jkpubsrc/python-module-jk-hwriter)
+* [github.com](https://github.com/jkpubsrc/python-module-jk-hwriter)
 * [pypi.python.org](https://pypi.python.org/pypi/jk_hwriter)
 
 Why this module?
