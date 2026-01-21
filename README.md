@@ -70,10 +70,6 @@ w.write("Foo Bar")
 Contact
 -------
 
-This work is open source. This way you can use this work for free.
-
-Please note that this also enables you to make a contribution. We, the subspecies of software developers, can make great things. However, the more we all work together, the more fantastic these things can get. Therefore feel free to contact the author(s) listed below, either for giving feedback, provide comments, hints, indicate possible collaborations, ideas, improvements. Or maybe for "only" reporting some bugs:
-
 * Jürgen Knauth: pubsrc@binary-overflow.de
 
 License

@@ -1,12 +1,13 @@
 
 
-import os
 import typing
 
-import jk_typing
 import jk_prettyprintobj
 
 
+
+
+from .TextChunk import TextChunk
 
 
 
@@ -21,16 +22,21 @@ class HWriter2(jk_prettyprintobj.DumpMixin):
 	#
 	# Constructor method.
 	#
-	@jk_typing.checkFunctionSignature()
 	def __init__(self):
-		self.__lines = []				# holds all completed lines
-		self.__nIndent = 0				# holds the current indentation level
-		self.__buffer = []				# holds all fragments for the next line to add
+		self.__lines:list[str] = []				# holds all completed lines
+		self.__buffer:list[str] = []			# holds all fragments for the next line to add
+		self.__stack = [{}]
+		self.__chunkConverters:dict[str,typing.Callable[[typing.Any],str]] = {}
 	#
 
 	################################################################################################################################
 	## Public Properties
 	################################################################################################################################
+
+	@property
+	def _nIndentLevel(self) -> int:
+		return (len(self.__stack) - 1)
+	#
 
 	################################################################################################################################
 	## Helper Methods
@@ -38,13 +44,34 @@ class HWriter2(jk_prettyprintobj.DumpMixin):
 
 	def _dump(self, ctx:jk_prettyprintobj.DumpCtx):
 		ctx.dumpVar("__lines", self.__lines)
-		ctx.dumpVar("__nIndent", self.__nIndent)
 		ctx.dumpVar("__buffer", self.__buffer)
+	#
+
+	def __toStr(self, item) -> str|None:
+		if isinstance(item, TextChunk):
+			conv = self.__chunkConverters.get(item.chunkType)
+			if conv is None:
+				raise Exception("No converter registered for chunk type " + repr(item.chunkType) + "!")
+			item = conv(item)
+			if item is not None:
+				assert isinstance(item, str)
+				if item:
+					return item
+			return None
+		else:
+			return str(item)
 	#
 
 	################################################################################################################################
 	## Public Methods
 	################################################################################################################################
+
+	def registerTextChunkConverter(self, chunkType:str, converterCallback:typing.Callable[[typing.Any],str]):
+		assert isinstance(chunkType, str)
+		assert callable(converterCallback)
+
+		self.__chunkConverters[chunkType] = converterCallback
+	#
 
 	def __len__(self):
 		if self.__buffer:
@@ -52,17 +79,21 @@ class HWriter2(jk_prettyprintobj.DumpMixin):
 			if s:
 				return len(self.__lines) + 1
 		else:
-			return self.__lines
+			return len(self.__lines)
 	#
 
 	def write(self, *items):
 		for item in items:
-			if isinstance(item, str):
+			if isinstance(item, TextChunk):
+				item = self.__toStr(item)
+				if item:
+					self.__buffer.append(item)
+			elif isinstance(item, str):
 				if item:
 					self.__buffer.append(item)
 			elif hasattr(type(item), "__iter__"):
 				for item2 in item:
-					s = str(item2)
+					s = self.__toStr(item2)
 					if s:
 						self.__buffer.append(s)
 			else:
@@ -75,7 +106,7 @@ class HWriter2(jk_prettyprintobj.DumpMixin):
 		if self.__buffer:
 			s = "".join(self.__buffer).rstrip()
 			if s:
-				self.__lines.append("\t" * self.__nIndent + s)
+				self.__lines.append("\t" * self._nIndentLevel + s)
 			self.__buffer.clear()
 	#
 
@@ -93,29 +124,29 @@ class HWriter2(jk_prettyprintobj.DumpMixin):
 	def __enter__(self):
 		if self.__buffer:
 			self.lineBreak()
-		self.__nIndent += 1
+		self.__stack.append({})
 	#
 
 	def __exit__(self, ex, exType, exStackTrace):
 		if self.__buffer:
 			self.lineBreak()
-		if self.__nIndent == 0:
+		if self._nIndentLevel == 0:
 			raise Exception("Deindentation error!")
-		self.__nIndent -= 1
+		self.__stack.pop()
 	#
 
 	def incrementIndent(self):
 		if self.__buffer:
 			self.lineBreak()
-		self.__nIndent += 1
+		self.__stack.append({})
 	#
 
 	def decrementIndent(self):
 		if self.__buffer:
 			self.lineBreak()
-		if self.__nIndent == 0:
+		if self._nIndentLevel == 0:
 			raise Exception("Deindentation error!")
-		self.__nIndent -= 1
+		self.__stack.pop()
 	#
 
 	#
@@ -138,6 +169,17 @@ class HWriter2(jk_prettyprintobj.DumpMixin):
 
 	def __repr__(self):
 		return "HWriter<" + str(len(self.__lines)) + " lines>"
+	#
+
+	def __getitem__(self, key:str):
+		for stackVars in reversed(self.__stack):
+			if key in stackVars:
+				return stackVars[key]
+		return None
+	#
+
+	def __setitem__(self, key:str, value):
+		self.__stack[-1][key] = value
 	#
 
 #

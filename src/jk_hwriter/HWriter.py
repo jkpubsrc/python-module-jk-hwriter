@@ -5,13 +5,36 @@
 
 class HWriter(object):
 
+	################################################################################################################################
+	## Constants
+	################################################################################################################################
+
+	################################################################################################################################
+	## Constructor
+	################################################################################################################################
+
+	#
+	# Constructor method.
+	#
 	def __init__(self):
 		self.__bIsNewLine = True		# are we at a new line position?
 		self.__bHasContent = False		# do we already have content in this line?
-		self.__allParts = []
+		self.__allParts:list[str] = []
 		self.__prefix = ""
 		self.__nIndent = 0
 	#
+
+	################################################################################################################################
+	## Public Properties
+	################################################################################################################################
+
+	################################################################################################################################
+	## Helper Methods
+	################################################################################################################################
+
+	################################################################################################################################
+	## Public Methods
+	################################################################################################################################
 
 	def incrementIndent(self):
 		self.__nIndent += 1
@@ -32,7 +55,12 @@ class HWriter(object):
 			self.__bIsNewLine = False
 
 		for item in items:
-			if hasattr(type(item), "__iter__"):
+			if isinstance(item, str):
+				if not self.__bHasContent:
+					self.__allParts.append(self.__prefix[:self.__nIndent])
+				self.__allParts.append(item)
+				self.__bHasContent = True
+			elif hasattr(type(item), "__iter__"):
 				for i in item:
 					if len(i) > 0:
 						if not self.__bHasContent:
@@ -54,7 +82,12 @@ class HWriter(object):
 			self.__bIsNewLine = False
 
 		for item in items:
-			if hasattr(type(item), "__iter__"):
+			if isinstance(item, str):
+				if not self.__bHasContent:
+					self.__allParts.append(self.__prefix[:self.__nIndent])
+				self.__allParts.append(item)
+				self.__bHasContent = True
+			elif hasattr(type(item), "__iter__"):
 				for i in item:
 					if len(i) > 0:
 						if not self.__bHasContent:
@@ -113,7 +146,15 @@ class HWriter(object):
 		return "HWriter<" + str(len(self.__allParts)) + " parts>"
 	#
 
+	################################################################################################################################
+	## Public Static Methods
+	################################################################################################################################
+
 #
+
+
+
+
 
 
 
