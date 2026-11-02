@@ -7,3 +7,9 @@
 	* Improved: Type annotations, comments
 	* Added: TextChunk
 	* Migrated to TOML
+
+* 2026-05-23:
+	* Refactoring
+	* Added: Documentation
+
+

@@ -4,16 +4,15 @@ import typing
 
 import jk_prettyprintobj
 
-
-
-
 from .TextChunk import TextChunk
+from .IHWriter2 import IHWriter2
 
 
 
 
 
-class HWriter2(jk_prettyprintobj.DumpMixin):
+
+class HWriter2(IHWriter2, jk_prettyprintobj.DumpMixin):
 
 	################################################################################################################################
 	## Constructor
@@ -47,7 +46,7 @@ class HWriter2(jk_prettyprintobj.DumpMixin):
 		ctx.dumpVar("__buffer", self.__buffer)
 	#
 
-	def __toStr(self, item) -> str|None:
+	def __toStr(self, item:TextChunk|typing.Any) -> str|None:
 		if isinstance(item, TextChunk):
 			conv = self.__chunkConverters.get(item.chunkType)
 			if conv is None:
@@ -73,16 +72,14 @@ class HWriter2(jk_prettyprintobj.DumpMixin):
 		self.__chunkConverters[chunkType] = converterCallback
 	#
 
-	def __len__(self):
-		if self.__buffer:
-			s = "".join(self.__buffer).rstrip()
-			if s:
-				return len(self.__lines) + 1
-		else:
-			return len(self.__lines)
-	#
+	# --------------------------------------------------------------------------------------------------------------------------------
 
-	def write(self, *items):
+	#
+	# Append the specified element to the current line.
+	#
+	# (core method)
+	#
+	def write(self, *items:str|TextChunk|list[TextChunk]|tuple[TextChunk]|typing.Any, **data):
 		for item in items:
 			if isinstance(item, TextChunk):
 				item = self.__toStr(item)
@@ -102,6 +99,12 @@ class HWriter2(jk_prettyprintobj.DumpMixin):
 					self.__buffer.append(s)
 	#
 
+	#
+	# Perform a line break.
+	# This ensures that the end of the buffer contains a line break.
+	#
+	# (core method)
+	#
 	def lineBreak(self):
 		if self.__buffer:
 			s = "".join(self.__buffer).rstrip()
@@ -110,23 +113,88 @@ class HWriter2(jk_prettyprintobj.DumpMixin):
 			self.__buffer.clear()
 	#
 
+	#
+	# Perform a double line break.
+	# This ensures that the end of the buffer contains an empty line.
+	#
+	# (core method)
+	#
 	def doubleLineBreak(self):
 		self.lineBreak()
 		if self.__lines and self.__lines[-1]:
 			self.__lines.append("")
 	#
 
+	#
+	# Perform a line break on the current line if it contains data. (If it is empty, do nothing.)
+	# Begin the new line with a higher indentation.
+	#
+	# (core method)
+	#
+	def incrementIndent(self):
+		if self.__buffer:
+			self.lineBreak()
+		self.__stack.append({})
+	#
+
+	#
+	# Perform a line break on the current line if it contains data. (If it is empty, do nothing.)
+	# Begin the new line with a lower indentation.
+	#
+	# (core method)
+	#
+	def decrementIndent(self):
+		if self.__buffer:
+			self.lineBreak()
+		if self._nIndentLevel == 0:
+			raise Exception("Deindentation error!")
+		self.__stack.pop()
+	#
+
+	# --------------------------------------------------------------------------------------------------------------------------------
+
+	#
+	# Retrieve a data value from this level of indentation.
+	#
+	# (core method)
+	#
+	def __getitem__(self, key:str) -> typing.Any|None:
+		for stackVars in reversed(self.__stack):
+			return stackVars.get(key)
+		return None
+	#
+
+	#
+	# Set a data value on this level of indentation.
+	#
+	# (core method)
+	#
+	def __setitem__(self, key:str, value):
+		self.__stack[-1][key] = value
+	#
+
+	# --------------------------------------------------------------------------------------------------------------------------------
+
+	#
+	# (high level method)
+	#
 	def writeLn(self, *items):
 		self.write(*items)
 		self.lineBreak()
 	#
 
+	#
+	# (high level method)
+	#
 	def __enter__(self):
 		if self.__buffer:
 			self.lineBreak()
 		self.__stack.append({})
 	#
 
+	#
+	# (high level method)
+	#
 	def __exit__(self, ex, exType, exStackTrace):
 		if self.__buffer:
 			self.lineBreak()
@@ -135,19 +203,7 @@ class HWriter2(jk_prettyprintobj.DumpMixin):
 		self.__stack.pop()
 	#
 
-	def incrementIndent(self):
-		if self.__buffer:
-			self.lineBreak()
-		self.__stack.append({})
-	#
-
-	def decrementIndent(self):
-		if self.__buffer:
-			self.lineBreak()
-		if self._nIndentLevel == 0:
-			raise Exception("Deindentation error!")
-		self.__stack.pop()
-	#
+	# --------------------------------------------------------------------------------------------------------------------------------
 
 	#
 	# Get a list of lines (without line breaks).
@@ -162,6 +218,15 @@ class HWriter2(jk_prettyprintobj.DumpMixin):
 		return "\n".join(self.__lines)
 	#
 
+	def __len__(self) -> int:
+		if self.__buffer:
+			s = "".join(self.__buffer).rstrip()
+			if s:
+				return len(self.__lines) + 1
+		else:
+			return len(self.__lines)
+	#
+
 	def __str__(self):
 		self.lineBreak()
 		return "\n".join(self.__lines)
@@ -169,17 +234,6 @@ class HWriter2(jk_prettyprintobj.DumpMixin):
 
 	def __repr__(self):
 		return "HWriter<" + str(len(self.__lines)) + " lines>"
-	#
-
-	def __getitem__(self, key:str):
-		for stackVars in reversed(self.__stack):
-			if key in stackVars:
-				return stackVars[key]
-		return None
-	#
-
-	def __setitem__(self, key:str, value):
-		self.__stack[-1][key] = value
 	#
 
 #

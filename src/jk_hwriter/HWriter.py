@@ -1,9 +1,14 @@
 
 
+import typing
+
+from .IHWriter import IHWriter
 
 
 
-class HWriter(object):
+
+
+class HWriter(IHWriter):
 
 	################################################################################################################################
 	## Constants
@@ -76,31 +81,7 @@ class HWriter(object):
 	#
 
 	def writeLn(self, *items):
-		# print("writeLn( " + repr(items) + " )")
-
-		if self.__bIsNewLine:
-			self.__bIsNewLine = False
-
-		for item in items:
-			if isinstance(item, str):
-				if not self.__bHasContent:
-					self.__allParts.append(self.__prefix[:self.__nIndent])
-				self.__allParts.append(item)
-				self.__bHasContent = True
-			elif hasattr(type(item), "__iter__"):
-				for i in item:
-					if len(i) > 0:
-						if not self.__bHasContent:
-							self.__allParts.append(self.__prefix[:self.__nIndent])
-						self.__allParts.append(i)
-						self.__bHasContent = True
-			else:
-				if len(item) > 0:
-					if not self.__bHasContent:
-						self.__allParts.append(self.__prefix[:self.__nIndent])
-					self.__allParts.append(item)
-					self.__bHasContent = True
-
+		self.write(*items)
 		self.lineBreak()
 	#
 
@@ -119,8 +100,8 @@ class HWriter(object):
 	#
 	# Get a list of lines (without line breaks).
 	#
-	def getLines(self) -> list:
-		ret = []
+	def getLines(self) -> list[str]:
+		ret:list[str] = []
 		iStart = 0
 		iMax = len(self.__allParts)
 		for i in range(0, iMax):
